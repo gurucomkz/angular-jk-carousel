@@ -11,6 +11,9 @@
       if (attrs.autoSlideTime === undefined) {
         ctrl.autoSlideTime = 5000;
       }
+      if (attrs.autoSlideStopOnAction === undefined) { 
+        ctrl.autoSlideStopOnAction = false; 
+      }       	  
       ctrl.registerElement(element);
       scope.$on('$destroy', function() {
         ctrl.stopAutoSlide();
@@ -21,6 +24,9 @@
       scope.$watch('ctrl.autoSlideTime', function() {
         ctrl.restartAutoSlide();
       });
+      scope.$watch('ctrl.autoSlideStopOnAction', function() { 
+        ctrl.validateAutoSlideStopOnAction(); 
+      });       	  
     }
 
     return {
@@ -36,7 +42,8 @@
         maxWidth: '@?',
         maxHeight: '@?',
         autoSlide: '@?',
-        autoSlideTime: '@?'
+        autoSlideTime: '@?', 
+        autoSlideStopOnAction: '@?'
       },
       link: link
     };

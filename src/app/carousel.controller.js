@@ -132,7 +132,13 @@
         that.startAutoSlide();
       }
     };
-
+	
+    that.validateAutoSlideStopOnAction = function() { 
+      if( typeof(that.autoSlideStopOnAction) === 'string' ){ 
+        that.autoSlideStopOnAction = that.autoSlideStopOnAction === 'true' ? true : false; 
+      } 
+    }; 
+ 	
     that.restartAutoSlide = function() {
       if (!that.autoSlide) {
         return;
@@ -241,8 +247,12 @@
       }
       that.currentIndex = that.radioButtonIndex;
       that.applyMarginLeft();
-      that.restartAutoSlide();
-    };
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }         
+	};
 
     that.isDataInvalidOrTooSmall = function() {
       if (!that.data || that.data.length <= 1) {
