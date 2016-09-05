@@ -157,7 +157,7 @@
     that.startAutoSlide = function() {
       if (!angular.isDefined(that.autoSlideInterval)) {
         that.autoSlideInterval = $interval(function() {
-          that.navigateRight();
+          that.navigateRight(true);
         }, that.autoSlideTime);
       }
     };
@@ -182,7 +182,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue += that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === -1) {
         that.restartFromLastItem();
       }
@@ -204,7 +208,7 @@
       that.restartAutoSlide();
     };
 
-    that.navigateRight = function() {
+    that.navigateRight = function(autoSlide) {
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
@@ -212,7 +216,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue -= that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (!autoSlide && that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === that.data.length) {
         $timeout(function() {
           that.restartFromFirstItem();
