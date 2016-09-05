@@ -132,7 +132,13 @@
         that.startAutoSlide();
       }
     };
-
+	
+    that.validateAutoSlideStopOnAction = function() { 
+      if( typeof(that.autoSlideStopOnAction) === 'string' ){ 
+        that.autoSlideStopOnAction = that.autoSlideStopOnAction === 'true' ? true : false; 
+      } 
+    }; 
+ 	
     that.restartAutoSlide = function() {
       if (!that.autoSlide) {
         return;
@@ -151,7 +157,7 @@
     that.startAutoSlide = function() {
       if (!angular.isDefined(that.autoSlideInterval)) {
         that.autoSlideInterval = $interval(function() {
-          that.navigateRight();
+          that.navigateRight(true);
         }, that.autoSlideTime);
       }
     };
@@ -176,7 +182,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue += that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === -1) {
         that.restartFromLastItem();
       }
@@ -198,7 +208,7 @@
       that.restartAutoSlide();
     };
 
-    that.navigateRight = function() {
+    that.navigateRight = function(autoSlide) {
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
@@ -206,7 +216,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue -= that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (!autoSlide && that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === that.data.length) {
         $timeout(function() {
           that.restartFromFirstItem();
@@ -241,8 +255,12 @@
       }
       that.currentIndex = that.radioButtonIndex;
       that.applyMarginLeft();
-      that.restartAutoSlide();
-    };
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }         
+	};
 
     that.isDataInvalidOrTooSmall = function() {
       if (!that.data || that.data.length <= 1) {
