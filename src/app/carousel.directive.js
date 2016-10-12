@@ -26,7 +26,11 @@
       });
       scope.$watch('ctrl.autoSlideStopOnAction', function() { 
         ctrl.validateAutoSlideStopOnAction(); 
-      });       	  
+      });
+      scope.$watch('ctrl.data', function () {
+        ctrl.onDataChange();
+      });
+      
     }
 
     return {
