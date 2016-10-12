@@ -9,6 +9,9 @@ Demo : https://embed.plnkr.co/ovBExhpO40yzWPJ47QFE/
 ### npm
 `npm install angular-jk-carousel`
 
+### bower
+`bower install angular-jk-carousel`
+
 ## Usage :
 
  - Add `jk-carousel.js` to your index file:
