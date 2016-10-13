@@ -1,6 +1,9 @@
 <div class="jk-carousel" >
 
-  <div class="slides-container" layout="row" >
+  <div class="slides-container" layout="row"
+    md-swipe-left="ctrl.navigateRight()"
+    md-swipe-right="ctrl.navigateLeft()"
+  >
     <div
       ng-repeat="slideItem in ctrl.cloneData"
       class="slide"
