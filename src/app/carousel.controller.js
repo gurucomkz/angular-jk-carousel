@@ -66,7 +66,7 @@
     };
 
     that.resizeSlides = function(){
-      var slides = $window.document.getElementsByClassName('slide');
+      var slides = that.element[0].querySelectorAll('.slide');
       for( var index=0; index < slides.length; index++ ){
         var slide = angular.element(slides[index]);
         slide.css('width', that.currentWidth + 'px');
