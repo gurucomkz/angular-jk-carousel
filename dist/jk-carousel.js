@@ -1,3 +1,9 @@
+/* commonjs package manager support (eg componentjs) */
+if (typeof module !== "undefined" && typeof exports !== "undefined" && module.exports === exports){
+  module.exports = 'jkAngularCarousel';
+}
+
+
 (function() {
   'use strict';
 
@@ -74,7 +80,7 @@
     };
 
     that.resizeSlides = function(){
-      var slides = $window.document.getElementsByClassName('slide');
+      var slides = that.element[0].querySelectorAll('.slide');
       for( var index=0; index < slides.length; index++ ){
         var slide = angular.element(slides[index]);
         slide.css('width', that.currentWidth + 'px');
@@ -140,7 +146,13 @@
         that.startAutoSlide();
       }
     };
-
+	
+    that.validateAutoSlideStopOnAction = function() { 
+      if( typeof(that.autoSlideStopOnAction) === 'string' ){ 
+        that.autoSlideStopOnAction = that.autoSlideStopOnAction === 'true' ? true : false; 
+      } 
+    }; 
+ 	
     that.restartAutoSlide = function() {
       if (!that.autoSlide) {
         return;
@@ -159,7 +171,7 @@
     that.startAutoSlide = function() {
       if (!angular.isDefined(that.autoSlideInterval)) {
         that.autoSlideInterval = $interval(function() {
-          that.navigateRight();
+          that.navigateRight(true);
         }, that.autoSlideTime);
       }
     };
@@ -184,7 +196,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue += that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === -1) {
         that.restartFromLastItem();
       }
@@ -206,7 +222,7 @@
       that.restartAutoSlide();
     };
 
-    that.navigateRight = function() {
+    that.navigateRight = function(autoSlide) {
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
@@ -214,7 +230,11 @@
       that.radioButtonIndex = that.currentIndex;
       that.currentMarginLeftValue -= that.currentWidth;
       that.applyMarginLeft();
-      that.restartAutoSlide();
+      if (!autoSlide && that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }
       if (that.currentIndex === that.data.length) {
         $timeout(function() {
           that.restartFromFirstItem();
@@ -249,8 +269,12 @@
       }
       that.currentIndex = that.radioButtonIndex;
       that.applyMarginLeft();
-      that.restartAutoSlide();
-    };
+      if (that.autoSlideStopOnAction) { 
+        that.stopAutoSlide(); 
+      } else {         
+        that.restartAutoSlide(); 
+      }         
+	};
 
     that.isDataInvalidOrTooSmall = function() {
       if (!that.data || that.data.length <= 1) {
@@ -282,6 +306,9 @@
       if (attrs.autoSlideTime === undefined) {
         ctrl.autoSlideTime = 5000;
       }
+      if (attrs.autoSlideStopOnAction === undefined) { 
+        ctrl.autoSlideStopOnAction = false; 
+      }       	  
       ctrl.registerElement(element);
       scope.$on('$destroy', function() {
         ctrl.stopAutoSlide();
@@ -292,6 +319,13 @@
       scope.$watch('ctrl.autoSlideTime', function() {
         ctrl.restartAutoSlide();
       });
+      scope.$watch('ctrl.autoSlideStopOnAction', function() { 
+        ctrl.validateAutoSlideStopOnAction(); 
+      });
+      scope.$watch('ctrl.data', function () {
+        ctrl.onDataChange();
+      });
+      
     }
 
     return {
@@ -307,7 +341,8 @@
         maxWidth: '@?',
         maxHeight: '@?',
         autoSlide: '@?',
-        autoSlideTime: '@?'
+        autoSlideTime: '@?', 
+        autoSlideStopOnAction: '@?'
       },
       link: link
     };
@@ -321,4 +356,4 @@
 
 }());
 
-(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\n\n  <div class=\"slides-container\" layout=\"row\" >\n    <div\n      ng-repeat=\"slideItem in ctrl.cloneData\"\n      class=\"slide\"\n    >\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\n    </div>\n  </div>\n\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\n    <md-icon >chevron_left</md-icon>\n  </md-button>\n\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\n    <md-icon >chevron_right</md-icon>\n  </md-button>\n\n  <md-radio-group\n    class=\"radio-buttons-container\"\n    layout=\"row\"\n    ng-model=\"ctrl.radioButtonIndex\"\n    layout-align=\"center center\"\n    ng-change=\"ctrl.onRadioButtonClick()\" >\n    <md-radio-button\n      ng-repeat=\"item in ctrl.data\"\n      ng-value=\"$index\"\n      aria-label=\"$index\" >\n    </md-radio-button>\n  </md-radio-group>\n\n</div>\n");}]);})();
+(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\r\n\r\n  <div class=\"slides-container\" layout=\"row\"\r\n    md-swipe-left=\"ctrl.navigateRight()\"\r\n    md-swipe-right=\"ctrl.navigateLeft()\"\r\n  >\r\n    <div\r\n      ng-repeat=\"slideItem in ctrl.cloneData\"\r\n      class=\"slide\"\r\n    >\r\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\r\n    </div>\r\n  </div>\r\n\r\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\r\n    <md-icon >chevron_left</md-icon>\r\n  </md-button>\r\n\r\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\r\n    <md-icon >chevron_right</md-icon>\r\n  </md-button>\r\n\r\n  <md-radio-group\r\n    class=\"radio-buttons-container\"\r\n    layout=\"row\"\r\n    ng-model=\"ctrl.radioButtonIndex\"\r\n    layout-align=\"center center\"\r\n    ng-change=\"ctrl.onRadioButtonClick()\" >\r\n    <md-radio-button\r\n      ng-repeat=\"item in ctrl.data\"\r\n      ng-value=\"$index\"\r\n      aria-label=\"$index\" >\r\n    </md-radio-button>\r\n  </md-radio-group>\r\n\r\n</div>\r\n");}]);})();

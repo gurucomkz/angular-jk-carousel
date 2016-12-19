@@ -22,6 +22,7 @@
   gulp.task('js', ['lint'], function() {
     var files = [];
 
+    files.push('src/app/**/*.exports.js');
     files.push('src/app/**/*.module.js');
     files.push('src/app/**/*.js');
 
