@@ -146,13 +146,13 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
         that.startAutoSlide();
       }
     };
-  
+	
     that.validateAutoSlideStopOnAction = function() { 
       if( typeof(that.autoSlideStopOnAction) === 'string' ){ 
         that.autoSlideStopOnAction = that.autoSlideStopOnAction === 'true' ? true : false; 
       } 
     }; 
-  
+ 	
     that.restartAutoSlide = function() {
       if (!that.autoSlide) {
         return;
@@ -274,7 +274,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       } else {         
         that.restartAutoSlide(); 
       }         
-  };
+	};
 
     that.isDataInvalidOrTooSmall = function() {
       if (!that.data || that.data.length <= 1) {
@@ -308,7 +308,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       }
       if (attrs.autoSlideStopOnAction === undefined) { 
         ctrl.autoSlideStopOnAction = false; 
-      }           
+      }       	  
       ctrl.registerElement(element);
       scope.$on('$destroy', function() {
         ctrl.stopAutoSlide();
