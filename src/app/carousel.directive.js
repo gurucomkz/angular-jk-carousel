@@ -42,6 +42,7 @@
       controllerAs: 'ctrl',
       bindToController: {
         data: '=',
+        currentIndex: '=',
         itemTemplateUrl: '=',
         maxWidth: '@?',
         maxHeight: '@?',
