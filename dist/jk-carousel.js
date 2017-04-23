@@ -24,6 +24,14 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
     that.transitionsTime = 500;
     that.transitionsEnabled = true;
 
+    if(!that.fontIconLeft) {
+      that.mdIconLeft = 'chevron_left';
+    }
+
+    if(!that.fontIconRight) {
+      that.mdIconRight = 'chevron_right';
+    }
+
     $attrs.$observe('data', function() {
       that.onDataChange();
     });
@@ -339,6 +347,8 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
         data: '=',
         currentIndex: '=',
         itemTemplateUrl: '=',
+        fontIconLeft: '@?',
+        fontIconRight: '@?',
         maxWidth: '@?',
         maxHeight: '@?',
         autoSlide: '@?',
@@ -357,4 +367,4 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
 
 }());
 
-(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\n\n  <div class=\"slides-container\" layout=\"row\"\n    md-swipe-left=\"ctrl.navigateRight()\"\n    md-swipe-right=\"ctrl.navigateLeft()\"\n  >\n    <div\n      ng-repeat=\"slideItem in ctrl.cloneData\"\n      class=\"slide\"\n    >\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\n    </div>\n  </div>\n\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\n    <md-icon >chevron_left</md-icon>\n  </md-button>\n\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\n    <md-icon >chevron_right</md-icon>\n  </md-button>\n\n  <md-radio-group\n    class=\"radio-buttons-container\"\n    layout=\"row\"\n    ng-model=\"ctrl.radioButtonIndex\"\n    layout-align=\"center center\"\n    ng-change=\"ctrl.onRadioButtonClick()\" >\n    <md-radio-button\n      ng-repeat=\"item in ctrl.data\"\n      ng-value=\"$index\"\n      aria-label=\"$index\" >\n    </md-radio-button>\n  </md-radio-group>\n\n</div>\n");}]);})();
+(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\n\n  <div class=\"slides-container\" layout=\"row\"\n    md-swipe-left=\"ctrl.navigateRight()\"\n    md-swipe-right=\"ctrl.navigateLeft()\"\n  >\n    <div\n      ng-repeat=\"slideItem in ctrl.cloneData\"\n      class=\"slide\"\n    >\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\n    </div>\n  </div>\n\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconLeft}}\">{{ctrl.mdIconLeft}}</md-icon>\n  </md-button>\n\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconRight}}\">{{ctrl.mdIconRight}}</md-icon>\n  </md-button>\n\n  <md-radio-group\n    class=\"radio-buttons-container\"\n    layout=\"row\"\n    ng-model=\"ctrl.radioButtonIndex\"\n    layout-align=\"center center\"\n    ng-change=\"ctrl.onRadioButtonClick()\" >\n    <md-radio-button\n      ng-repeat=\"item in ctrl.data\"\n      ng-value=\"$index\"\n      aria-label=\"$index\" >\n    </md-radio-button>\n  </md-radio-group>\n\n</div>\n");}]);})();
