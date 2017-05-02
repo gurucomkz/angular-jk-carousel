@@ -44,6 +44,8 @@
         data: '=',
         currentIndex: '=',
         itemTemplateUrl: '=',
+        fontIconLeft: '@?',
+        fontIconRight: '@?',
         maxWidth: '@?',
         maxHeight: '@?',
         autoSlide: '@?',

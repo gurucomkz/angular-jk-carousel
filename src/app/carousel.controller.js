@@ -10,6 +10,14 @@
     that.transitionsTime = 500;
     that.transitionsEnabled = true;
 
+    if(!that.fontIconLeft) {
+      that.mdIconLeft = 'chevron_left';
+    }
+
+    if(!that.fontIconRight) {
+      that.mdIconRight = 'chevron_right';
+    }
+
     $attrs.$observe('data', function() {
       that.onDataChange();
     });
