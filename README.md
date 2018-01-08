@@ -58,6 +58,11 @@ vm.arrayData = [
  <jk-carousel data="ctrl.arrayData" item-template-url="'item-template.html'" auto-slide="true" auto-slide-time="1000" max-width="700" max-height="400" >
  </jk-carousel>
  ```
+ - It is possible to set current image by externally modifying `current-index` attribute:
+ ```html
+ <jk-carousel current-index="ctrl.imageIndex" data="ctrl.arrayData" item-template-url="'item-template.html'" auto-slide="true" auto-slide-time="1000" max-width="700" max-height="400" >
+ </jk-carousel>
+ ```
 
 
 ## TODO :

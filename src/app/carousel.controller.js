@@ -4,9 +4,11 @@
   function CarouselController($timeout, $attrs, $interval, $window) {
 
     var that = this;
-    that.currentIndex = 0;
+    if(typeof that.currentIndex !== 'number') {
+        that.currentIndex = 0;
+    }
+    that.internalIndexChange = false;
     that.currentMarginLeftValue = 0;
-    that.radioButtonIndex = 0;
     that.transitionsTime = 500;
     that.transitionsEnabled = true;
 
@@ -21,6 +23,13 @@
     $attrs.$observe('data', function() {
       that.onDataChange();
     });
+
+    that.setCurrentIndex = function(newval){
+        if(that.currentIndex!==newval) {
+            that.currentIndex = newval;
+            that.internalIndexChange = true;
+        }
+    };
 
     that.registerElement = function(element) {
       that.element = element;
@@ -102,8 +111,7 @@
       that.disableTransitions();
       that.currentMarginLeftValue = that.currentWidth * -1;
       that.applyMarginLeft();
-      that.currentIndex = 0;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(0);
       that.enableTransitions();
     };
 
@@ -186,8 +194,7 @@
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
-      that.currentIndex--;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(that.currentIndex-1);
       that.currentMarginLeftValue += that.currentWidth;
       that.applyMarginLeft();
       if (that.autoSlideStopOnAction) { 
@@ -205,8 +212,7 @@
         that.disableTransitions();
         that.currentMarginLeftValue = (that.currentWidth * that.data.length) * -1;
         that.applyMarginLeft();
-        that.currentIndex = that.data.length - 1;
-        that.radioButtonIndex = that.currentIndex;
+        that.setCurrentIndex(that.data.length - 1);
         that.enableTransitions();
       }, that.transitionsTime);
     };
@@ -220,8 +226,7 @@
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
-      that.currentIndex++;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(that.currentIndex+1);
       that.currentMarginLeftValue -= that.currentWidth;
       that.applyMarginLeft();
       if (!autoSlide && that.autoSlideStopOnAction) { 
@@ -252,16 +257,15 @@
       }, 200);
     };
 
-    that.onRadioButtonClick = function() {
-      var multiplier;
-      if (that.radioButtonIndex > that.currentIndex) {
-        multiplier = that.radioButtonIndex - that.currentIndex;
-        that.currentMarginLeftValue -= (that.currentWidth * multiplier);
-      } else {
-        multiplier = that.currentIndex - that.radioButtonIndex;
-        that.currentMarginLeftValue += (that.currentWidth * multiplier);
+    that.onIndexChange = function(newval,oldval) {
+      if(that.internalIndexChange){ 
+          that.internalIndexChange = false;
+          return; 
       }
-      that.currentIndex = that.radioButtonIndex;
+      if('number' !== typeof that.currentMarginLeftValue) {
+          that.currentMarginLeftValue = 0;
+      }
+      that.currentMarginLeftValue += (that.currentWidth * (oldval - newval)); //rval becomes negative when needed
       that.applyMarginLeft();
       if (that.autoSlideStopOnAction) { 
         that.stopAutoSlide(); 

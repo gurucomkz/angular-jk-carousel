@@ -18,9 +18,11 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
   function CarouselController($timeout, $attrs, $interval, $window) {
 
     var that = this;
-    that.currentIndex = 0;
+    if(typeof that.currentIndex !== 'number') {
+        that.currentIndex = 0;
+    }
+    that.internalIndexChange = false;
     that.currentMarginLeftValue = 0;
-    that.radioButtonIndex = 0;
     that.transitionsTime = 500;
     that.transitionsEnabled = true;
 
@@ -35,6 +37,13 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
     $attrs.$observe('data', function() {
       that.onDataChange();
     });
+
+    that.setCurrentIndex = function(newval){
+        if(that.currentIndex!==newval) {
+            that.currentIndex = newval;
+            that.internalIndexChange = true;
+        }
+    };
 
     that.registerElement = function(element) {
       that.element = element;
@@ -116,8 +125,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       that.disableTransitions();
       that.currentMarginLeftValue = that.currentWidth * -1;
       that.applyMarginLeft();
-      that.currentIndex = 0;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(0);
       that.enableTransitions();
     };
 
@@ -200,8 +208,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
-      that.currentIndex--;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(that.currentIndex-1);
       that.currentMarginLeftValue += that.currentWidth;
       that.applyMarginLeft();
       if (that.autoSlideStopOnAction) { 
@@ -219,8 +226,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
         that.disableTransitions();
         that.currentMarginLeftValue = (that.currentWidth * that.data.length) * -1;
         that.applyMarginLeft();
-        that.currentIndex = that.data.length - 1;
-        that.radioButtonIndex = that.currentIndex;
+        that.setCurrentIndex(that.data.length - 1);
         that.enableTransitions();
       }, that.transitionsTime);
     };
@@ -234,8 +240,7 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       if (that.isDataInvalidOrTooSmall()) {
         return;
       }
-      that.currentIndex++;
-      that.radioButtonIndex = that.currentIndex;
+      that.setCurrentIndex(that.currentIndex+1);
       that.currentMarginLeftValue -= that.currentWidth;
       that.applyMarginLeft();
       if (!autoSlide && that.autoSlideStopOnAction) { 
@@ -266,16 +271,15 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       }, 200);
     };
 
-    that.onRadioButtonClick = function() {
-      var multiplier;
-      if (that.radioButtonIndex > that.currentIndex) {
-        multiplier = that.radioButtonIndex - that.currentIndex;
-        that.currentMarginLeftValue -= (that.currentWidth * multiplier);
-      } else {
-        multiplier = that.currentIndex - that.radioButtonIndex;
-        that.currentMarginLeftValue += (that.currentWidth * multiplier);
+    that.onIndexChange = function(newval,oldval) {
+      if(that.internalIndexChange){ 
+          that.internalIndexChange = false;
+          return; 
       }
-      that.currentIndex = that.radioButtonIndex;
+      if('number' !== typeof that.currentMarginLeftValue) {
+          that.currentMarginLeftValue = 0;
+      }
+      that.currentMarginLeftValue += (that.currentWidth * (oldval - newval)); //rval becomes negative when needed
       that.applyMarginLeft();
       if (that.autoSlideStopOnAction) { 
         that.stopAutoSlide(); 
@@ -333,6 +337,9 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
       scope.$watch('ctrl.data', function () {
         ctrl.onDataChange();
       });
+      scope.$watch('ctrl.currentIndex', function (newval,oldval) {
+        ctrl.onIndexChange(newval,oldval);
+      });
       
     }
 
@@ -367,4 +374,4 @@ if (typeof module !== "undefined" && typeof exports !== "undefined" && module.ex
 
 }());
 
-(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\n\n  <div class=\"slides-container\" layout=\"row\"\n    md-swipe-left=\"ctrl.navigateRight()\"\n    md-swipe-right=\"ctrl.navigateLeft()\"\n  >\n    <div\n      ng-repeat=\"slideItem in ctrl.cloneData\"\n      class=\"slide\"\n    >\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\n    </div>\n  </div>\n\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconLeft}}\">{{ctrl.mdIconLeft}}</md-icon>\n  </md-button>\n\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconRight}}\">{{ctrl.mdIconRight}}</md-icon>\n  </md-button>\n\n  <md-radio-group\n    class=\"radio-buttons-container\"\n    layout=\"row\"\n    ng-model=\"ctrl.radioButtonIndex\"\n    layout-align=\"center center\"\n    ng-change=\"ctrl.onRadioButtonClick()\" >\n    <md-radio-button\n      ng-repeat=\"item in ctrl.data\"\n      ng-value=\"$index\"\n      aria-label=\"$index\" >\n    </md-radio-button>\n  </md-radio-group>\n\n</div>\n");}]);})();
+(function(){angular.module("jkAngularCarousel.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("carousel-directive.html","<div class=\"jk-carousel\" >\n\n  <div class=\"slides-container\" layout=\"row\"\n    md-swipe-left=\"ctrl.navigateRight()\"\n    md-swipe-right=\"ctrl.navigateLeft()\"\n  >\n    <div\n      ng-repeat=\"slideItem in ctrl.cloneData\"\n      class=\"slide\"\n    >\n      <div ng-include=\"ctrl.itemTemplateUrl\" ></div>\n    </div>\n  </div>\n\n  <md-button class=\"md-icon-button left-arrow-button\" ng-click=\"ctrl.navigateLeft()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconLeft}}\">{{ctrl.mdIconLeft}}</md-icon>\n  </md-button>\n\n  <md-button class=\"md-icon-button right-arrow-button\" ng-click=\"ctrl.navigateRight()\" >\n    <md-icon md-font-icon=\"{{ctrl.fontIconRight}}\">{{ctrl.mdIconRight}}</md-icon>\n  </md-button>\n\n  <md-radio-group\n    class=\"radio-buttons-container\"\n    layout=\"row\"\n    ng-model=\"ctrl.currentIndex\"\n    layout-align=\"center center\" >\n    <md-radio-button\n      ng-repeat=\"item in ctrl.data\"\n      ng-value=\"$index\"\n      aria-label=\"$index\" >\n    </md-radio-button>\n  </md-radio-group>\n\n</div>\n");}]);})();

@@ -23,9 +23,8 @@
   <md-radio-group
     class="radio-buttons-container"
     layout="row"
-    ng-model="ctrl.radioButtonIndex"
-    layout-align="center center"
-    ng-change="ctrl.onRadioButtonClick()" >
+    ng-model="ctrl.currentIndex"
+    layout-align="center center" >
     <md-radio-button
       ng-repeat="item in ctrl.data"
       ng-value="$index"

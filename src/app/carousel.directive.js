@@ -30,6 +30,9 @@
       scope.$watch('ctrl.data', function () {
         ctrl.onDataChange();
       });
+      scope.$watch('ctrl.currentIndex', function (newval,oldval) {
+        ctrl.onIndexChange(newval,oldval);
+      });
       
     }
 
